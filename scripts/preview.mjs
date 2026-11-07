@@ -20,7 +20,7 @@ const server = http.createServer(async (req, res) => {
       // Development-only route. Production still uses both confirmation gates.
       const html = (await fs.readFile(new URL('../lib/scene.html', import.meta.url), 'utf8'))
         .replace('/*__COCKPIT_CONFIG__*/', 'window.__DSH_COCKPIT_FRAME__={sound:false};')
-        .replace('observer.disconnect();beginAccess();', 'observer.disconnect();reviewProgress(100);enterHome();');
+        .replace('observer.disconnect();beginAccess();', 'observer.disconnect();root.classList.add("dc-scene-ready");reviewProgress(100);enterHome();');
       res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.end(html); return;
     }
     if (pathname === '/layout-preview') {

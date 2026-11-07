@@ -3,9 +3,11 @@ __DS_FONTS__
 #deepseek-cockpit {
   --dc-blue:#647fff;--dc-cyan:#94dfff;--dc-ink:#eef5ff;--dc-muted:#a5b9ce;--dc-line:#9fb9d332;
   --dc-scene-light:.22;--dc-power:0;--dc-core-alpha:0;--dc-core-cut:100%;--dc-diagram:0;--dc-form:0;--dc-move:0;
-  position:relative;isolation:isolate;box-sizing:border-box;width:100%;height:760px;overflow:clip;background:#030710;
+  position:relative;isolation:isolate;box-sizing:border-box;width:100%;height:760px;overflow:clip;background:#030710;opacity:0;transition:opacity .4s ease;
   color:var(--dc-ink);color-scheme:dark;font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
 }
+#deepseek-cockpit.dc-scene-ready{opacity:1}
+#deepseek-cockpit.dc-reduced-motion{transition:none}
 #deepseek-cockpit *,#deepseek-cockpit *::before,#deepseek-cockpit *::after{box-sizing:border-box}
 #deepseek-cockpit [hidden]{display:none!important}
 #deepseek-cockpit button,#deepseek-cockpit input{font:inherit}
@@ -434,7 +436,7 @@ __DS_AUTH_STYLE__
   applyLocale();narration.load();root.classList.toggle('dc-reduced-motion',reduced);
   root.style.setProperty('--dc-scene-url','url("'+scene.src+'")');
   new ResizeObserver(dimensions).observe(root);
-  Promise.allSettled([scene.decode(),whale.decode()]).then(()=>{
+  Promise.allSettled([scene.decode(),whale.decode(),document.fonts?.ready]).then(()=>{
     try{sampleWhale();}catch(_){}
     state.ready=true;dimensions();
     let launched=false;

@@ -45,11 +45,12 @@ export function mountCockpit(sceneHtml, input, installBackground, createAmbientV
   const frame = document.createElement('iframe');
   frame.title = 'DeepSeek Harness cockpit'; frame.allow = 'autoplay';
   frame.style.cssText = 'border:0;width:100%;height:100%;display:block;background:#030710;';
+  frame.style.visibility = 'hidden';
   const channel = crypto.randomUUID();
   let disposed = false, ready = false, closing = false, welcomeTimer = 0, removeTimer = 0, welcomeTimeDone = false, welcomeVoiceDone = true;
   function finalize() {
     if (disposed) return; disposed = true; clearTimeout(removeTimer); clearTimeout(watchdog); clearTimeout(welcomeTimer);
-    observer.disconnect(); window.removeEventListener('message', onMessage); window.removeEventListener('pagehide', onPageHide);
+    observer.disconnect(); window.removeEventListener('message', onMessage); window.removeEventListener('pagehide', onPageHide); window.removeEventListener('keydown', onKeyDown, true);
     root.remove(); critical?.remove();
     background?.reveal();
     document.documentElement.style.overflow = previousOverflow;
@@ -74,6 +75,7 @@ export function mountCockpit(sceneHtml, input, installBackground, createAmbientV
       ready = true; clearTimeout(watchdog);
       write('sessionStorage', 'shown', '1'); write('localStorage', 'day', today);
       root.dataset.ready = 'true'; critical?.remove();
+      frame.style.visibility = 'visible'; frame.focus();
     } else if (message.type === 'preferences') {
       const next = message.preferences;
       if (next && ['en', 'zh'].includes(next.language) && typeof next.sound === 'boolean') write('localStorage', 'preferences', JSON.stringify({ language: next.language, sound: next.sound }));
@@ -87,7 +89,13 @@ export function mountCockpit(sceneHtml, input, installBackground, createAmbientV
   }
   const watchdog = setTimeout(() => { if (!ready) dispose(true); }, 15000);
   function onPageHide() { dispose(true); background?.dispose(); }
+  function onKeyDown(event) {
+    if (!ready || disposed || closing || event.defaultPrevented || event.isComposing || event.repeat || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || !['Enter', 'Escape'].includes(event.key)) return;
+    event.preventDefault(); event.stopPropagation();
+    frame.contentWindow?.postMessage({ channel, type: 'keyboard', key: event.key }, '*');
+  }
   window.addEventListener('message', onMessage); window.addEventListener('pagehide', onPageHide);
+  window.addEventListener('keydown', onKeyDown, true);
   const json = JSON.stringify({ ...cfg, _channel: channel }).replace(/</g, '\\u003c');
   frame.srcdoc = sceneHtml.replace('/*__COCKPIT_CONFIG__*/', 'window.__DSH_COCKPIT_FRAME__=' + json + ';');
   root.replaceChildren(frame);

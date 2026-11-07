@@ -1,6 +1,6 @@
 {
   "name": "dsh-cockpit-startup",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Cinematic mech cockpit startup plugin for DeepSeek Harness",
   "type": "module",
   "main": "lib/index.js",

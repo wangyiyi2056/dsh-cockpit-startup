@@ -74,7 +74,7 @@ function beginAccess(){
   authorizationVFX.show(q('.dc-permission'),'permission');
   if(state.audioUnlocked)narration.unlock();
   announcePermission();
-  notify('ready');q('.dc-permit').focus({preventScroll:true});
+  root.classList.add('dc-scene-ready');notify('ready');q('.dc-permit').focus({preventScroll:true});
 }
 function announcePermission(){
   if(state.permissionAnnounced)return state.permissionSpeech||Promise.resolve();
@@ -168,7 +168,23 @@ function unlockOnInteraction(event){
 root.addEventListener('pointerdown',unlockOnInteraction,{capture:true});root.addEventListener('keydown',unlockOnInteraction,{capture:true});
 q('.dc-language').addEventListener('click',()=>{config.language=config.language==='en'?'zh':'en';applyLocale();save();});
 q('.dc-sound').addEventListener('click',()=>{state.audioUnlocked=true;config.sound=!config.sound;stopAudio();updateSound();if(config.sound){narration.load();narration.unlock();tone(1);announcePermission();}save();});
-document.addEventListener('keydown',async event=>{
-  if(event.key==='Escape'){event.preventDefault();stopAudio();notify('exit');}
-  else if(event.key==='Enter'&&state.mode==='entered'){event.preventDefault();await state.welcomeSpeech;if(state.mode==='entered')notify('exit');}
+async function handleStartupKey(event){
+  if(event.defaultPrevented||event.isComposing||event.altKey||event.ctrlKey||event.metaKey||event.shiftKey)return;
+  if(event.key==='Escape'){event.preventDefault();stopAudio();notify('exit');return;}
+  if(event.key!=='Enter')return;
+  const target=event.target;
+  if(target?.closest('input,textarea,select,[contenteditable="true"]'))return;
+  const button=target?.closest('button');
+  if(button&&!button.matches('.dc-permit,.dc-confirm,.dc-enter'))return;
+  event.preventDefault();if(event.repeat)return;
+  if(!state.audioUnlocked)unlockOnInteraction({target:root});
+  if(state.mode==='permission')confirmPermission();
+  else if(state.mode==='identity')confirmIdentity();
+  else if(state.mode==='granted')enterHome();
+  else if(state.mode==='entered'){await state.welcomeSpeech;if(state.mode==='entered')notify('exit');}
+}
+document.addEventListener('keydown',handleStartupKey);
+window.addEventListener('message',event=>{
+  if(event.source!==parent||event.data?.channel!==config._channel||event.data.type!=='keyboard')return;
+  handleStartupKey({key:event.data.key,target:root,preventDefault(){}});
 });

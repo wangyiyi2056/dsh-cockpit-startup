@@ -15,7 +15,7 @@ DeepSeek Harness 的机甲驾驶舱启动插件。默认英文，支持中文切
 打开 Harness 的 **插件 → 添加插件**，在包名或地址输入框中，**只粘贴下面这一行地址**：
 
 ```text
-https://github.com/wangyiyi2056/dsh-cockpit-startup/releases/download/v1.2.0/dsh-cockpit-startup-1.2.0.tgz
+https://github.com/wangyiyi2056/dsh-cockpit-startup/releases/download/v1.2.1/dsh-cockpit-startup-1.2.1.tgz
 ```
 
 点击安装，完成后重新打开 Harness，即可播放启动画面。无需提前下载文件。
@@ -27,14 +27,14 @@ https://github.com/wangyiyi2056/dsh-cockpit-startup/releases/download/v1.2.0/dsh
 如果使用终端，则运行下面的完整命令。先至少启动过一次 DeepSeek Harness 桌面端，让它初始化 `desktop` profile；完全退出桌面端后执行：
 
 ```bash
-dsh plugin --profile desktop add https://github.com/wangyiyi2056/dsh-cockpit-startup/releases/download/v1.2.0/dsh-cockpit-startup-1.2.0.tgz
+dsh plugin --profile desktop add https://github.com/wangyiyi2056/dsh-cockpit-startup/releases/download/v1.2.1/dsh-cockpit-startup-1.2.1.tgz
 dsh plugin --profile desktop list
 ```
 
 重新打开 Harness 即可。Web profile 使用：
 
 ```bash
-dsh plugin --profile web add https://github.com/wangyiyi2056/dsh-cockpit-startup/releases/download/v1.2.0/dsh-cockpit-startup-1.2.0.tgz
+dsh plugin --profile web add https://github.com/wangyiyi2056/dsh-cockpit-startup/releases/download/v1.2.1/dsh-cockpit-startup-1.2.1.tgz
 ```
 
 Web 用户请在执行前停止正在运行的 `dsh web`，安装完成后重新启动。自定义 profile 将命令中的 `desktop` 或 `web` 换成实际使用的名称。
@@ -43,17 +43,17 @@ Web 用户请在执行前停止正在运行的 `dsh web`，安装完成后重新
 
 | 使用位置 | 填写内容 |
 | --- | --- |
-| Harness“添加插件”输入框 | 仅填写 `https://…/dsh-cockpit-startup-1.2.0.tgz` 完整地址 |
+| Harness“添加插件”输入框 | 仅填写 `https://…/dsh-cockpit-startup-1.2.1.tgz` 完整地址 |
 | 系统终端 | 执行 `dsh plugin --profile desktop add <完整地址>` 完整命令 |
 
 如果已安装社区 `dsh-startup-screen`，先在对应 profile 的插件管理中停用它，避免两个启动画面同时覆盖。
 
 ### 本地安装包添加
 
-需要离线安装时，从 [Releases](https://github.com/wangyiyi2056/dsh-cockpit-startup/releases/latest) 下载 `dsh-cockpit-startup-1.2.0.tgz`，在文件所在目录执行：
+需要离线安装时，从 [Releases](https://github.com/wangyiyi2056/dsh-cockpit-startup/releases/latest) 下载 `dsh-cockpit-startup-1.2.1.tgz`，在文件所在目录执行：
 
 ```bash
-dsh plugin --profile desktop add ./dsh-cockpit-startup-1.2.0.tgz
+dsh plugin --profile desktop add ./dsh-cockpit-startup-1.2.1.tgz
 ```
 
 ### 卸载
@@ -64,11 +64,11 @@ dsh plugin --profile desktop remove dsh-cockpit-startup
 
 ### 从旧版本更新
 
-在插件管理中卸载旧版，再使用上方 **v1.2.0** 地址添加，完成后重启 Harness。v1.2.0 将欢迎页鲸鱼合成进背景视频，修复缩放错位和大屏尺寸过小。插件配置文件会保留：旧版默认的 11 秒加载自动调整为 9 秒，误填的本机海报路径自动恢复为内置视频。图形界面若提示已安装，也按此方式更新。
+在插件管理中卸载旧版，再使用上方 **v1.2.1** 地址添加，完成后重启 Harness。v1.2.0 已将欢迎页鲸鱼合成进背景视频；v1.2.1 补充首次许可页的回车确认，并修复首次背景填充闪烁。插件配置文件会保留：旧版默认的 11 秒加载自动调整为 9 秒，误填的本机海报路径自动恢复为内置视频。图形界面若提示已安装，也按此方式更新。
 
 ## 使用与配置
 
-前两步各点击一次确认，默认身份自动核验，不需要输入密码。最后点击 `ENTER DEEPSEEK`，展示完整欢迎动画，默认停留 12 秒后淡出到工作区，驾驶舱视频继续作为控制台背景。欢迎画面按 Enter 会等待当前欢迎语结束后进入工作区；任意阶段按 Esc 可直接放行。
+前两步可直接按 Enter 确认，也可点击；默认身份自动核验，不需要输入密码。首次显示时不依赖按钮自动聚焦，长按 Enter 不会跳过下一步。背景图片、字体和初始布局就绪后整体淡入，避免首次填充时闪烁。最后点击 `ENTER DEEPSEEK`，展示完整欢迎动画，默认停留 12 秒后淡出到工作区，驾驶舱视频继续作为控制台背景。欢迎画面按 Enter 会等待当前欢迎语结束后进入工作区；任意阶段按 Esc 可直接放行。
 
 设置 → **DeepSeek Cockpit**：
 
@@ -134,7 +134,7 @@ test/            Host / 客户端 / 生命周期 / 语音测试
 
 Host 导出 `name / inject / apply`，通过 `cordis.patch.yml` 安装；客户端使用 `window.__ModuleLoader__.load` 与 `settings.section`，参考 [社区插件](https://github.com/QIFANAI/dsh-startup-screen)。未复制其整套视觉代码。
 
-v1.2.0 通过 19 项自动测试，在 1920×1080、3840×2160、3440×1440 和 375px 窄屏检查了欢迎页视频裁切。此前 v1.1.0 已在 **macOS / Harness Desktop 0.2.1-rc.5** 完成安装和重启，控制台背景由用户确认可用。浏览器中验证了完整欢迎语的播报开始与结束、欢迎页视频播放、覆盖层释放、会话去重和独立客户端挂载。Windows、Linux 及其他宿主版本仍需实际安装确认。
+v1.2.1 通过 23 项自动测试，在 1920×1080、3840×2160、3440×1440 和 375px 窄屏检查了欢迎页视频裁切。此前 v1.1.0 已在 **macOS / Harness Desktop 0.2.1-rc.5** 完成安装和重启，控制台背景由用户确认可用。浏览器中验证了完整欢迎语的播报开始与结束、欢迎页视频播放、覆盖层释放、会话去重和独立客户端挂载。Windows、Linux 及其他宿主版本仍需实际安装确认。
 
 权限与密码画面是启动仪式，不执行真实身份认证，也不修改 Harness 的权限、登录状态或安全设置。脚本启动失败时自动移除覆盖层；插件卸载会恢复工作区的焦点、滚动及可交互状态。
 

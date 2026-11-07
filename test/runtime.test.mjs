@@ -7,13 +7,15 @@ import { mountCockpit } from '../src/runtime.js';
 function harness(input = {}, alreadyShown = false) {
   const listeners = new Map(), timers = new Map(), stores = { localStorage: new Map(), sessionStorage: new Map() };
   let id = 0, observerDisconnected = false;
+  const frameMessages = [];
   const body = { children: [], appendChild(node) { node.parentNode = this; this.children.push(node); } };
   function node(tagName) {
+    tagName = tagName.toUpperCase();
     return { tagName, children: [], style: {}, dataset: {}, inert: false, isConnected: true, attrs: {},
       setAttribute(k, v) { this.attrs[k] = v; },
       remove() { this.isConnected = false; if (this.parentNode) this.parentNode.children = this.parentNode.children.filter(item => item !== this); },
       replaceChildren(child) { this.children = [child]; child.parentNode = this; }, focus() { this.focused = true; },
-      ...(tagName === 'IFRAME' ? { contentWindow: { postMessage() {} } } : {}) };
+      ...(tagName === 'IFRAME' ? { contentWindow: { postMessage(message) { frameMessages.push(message); } } } : {}) };
   }
   const app = node('MAIN'), wasInert = node('ASIDE'); wasInert.inert = true; body.appendChild(app); body.appendChild(wasInert);
   const document = { body, head: node('HEAD'), activeElement: app, documentElement: { style: { overflow: 'scroll' } }, getElementById: value => body.children.find(item => item.id === value), createElement: node };
@@ -29,8 +31,23 @@ function harness(input = {}, alreadyShown = false) {
   const root = document.getElementById('dsh-cockpit-root'), frame = root?.children[0];
   const message = (data, source = frame?.contentWindow) => listeners.get('message')?.({ source, data: { channel: 'test-channel', ...data } });
   const fire = ms => { for (const [key, task] of [...timers]) if (task.ms === ms) { timers.delete(key); task.fn(); } };
-  return { api, root, frame, background, app, wasInert, document, stores, timers, run, fire, message, listeners, isDisconnected: () => observerDisconnected };
+  return { api, root, frame, frameMessages, background, app, wasInert, document, stores, timers, run, fire, message, listeners, isDisconnected: () => observerDisconnected };
 }
+
+test('cold startup stays covered until ready, then receives keyboard commands without relying on autofocus', () => {
+  const h = harness();
+  const event = () => ({ key: 'Enter', preventDefault() { this.prevented = true; }, stopPropagation() {} });
+  assert.equal(h.frame.style.visibility, 'hidden');
+  h.listeners.get('keydown')(event()); assert.equal(h.frameMessages.length, 0);
+  h.message({ type: 'ready' }, {}); assert.equal(h.frame.style.visibility, 'hidden');
+  h.message({ type: 'ready' });
+  assert.equal(h.frame.style.visibility, 'visible'); assert.equal(h.frame.focused, true);
+  const key = event(); h.listeners.get('keydown')(key);
+  assert.equal(key.prevented, true);
+  assert.equal(h.frameMessages[0].type, 'keyboard'); assert.equal(h.frameMessages[0].key, 'Enter');
+  h.listeners.get('keydown')({ ...event(), repeat: true }); assert.equal(h.frameMessages.length, 1);
+  h.api.dispose(true); assert.equal(h.listeners.has('keydown'), false);
+});
 
 test('mount isolates host, rejects unrelated messages and fully restores on welcome completion', () => {
   const h = harness({ identity: '</script><img>' });
