@@ -14,12 +14,11 @@ const traces = JSON.parse(await read('src/scene/whale-traces.json'));
 const coordinates = traces[0].d.match(/-?[\d.]+/g).map(Number).filter((_, index) => index % 2 === 1);
 const top = Math.floor(Math.min(...coordinates)) - 2, height = Math.ceil(Math.max(...coordinates)) - top + 2;
 const whale = (await read('src/scene/whale-linework.svg')).replace('__DS_WHALE_BODY__', traces.map(trace => trace.d).join(' ')).replace('__DS_WHALE_TOP__', top).replace('__DS_WHALE_HEIGHT__', height);
-fragment = fragment.replace('__DS_WHALE_LINEWORK__', whale).replace('__DS_HOME_WHALE_PATH__', JSON.stringify(traces.map(trace => trace.d).join(' ')));
-for (const [token, file] of Object.entries({ VOICE_ENGINE: 'community-voice.js', INTERFACE_COPY: 'interface-copy.js', AUTH_STYLE: 'authorization.css', AUTH_VFX: 'credential-vfx.js', HOME_VFX: 'home-whale-stars.js', ACCESS_FLOW: 'access-flow.js' })) {
+fragment = fragment.replace('__DS_WHALE_LINEWORK__', whale);
+for (const [token, file] of Object.entries({ VOICE_ENGINE: 'community-voice.js', INTERFACE_COPY: 'interface-copy.js', AUTH_STYLE: 'authorization.css', AUTH_VFX: 'credential-vfx.js', ACCESS_FLOW: 'access-flow.js' })) {
   const content = await read('src/scene/' + file);
   fragment = fragment.replace('__DS_' + token + '__', () => content);
 }
-fragment = fragment.replace('__DS_HOME_WHALE_PATH__', JSON.stringify(traces.map(trace => trace.d).join(' ')));
 fragment = fragment.replace('__DS_MEDIA_ENGINE__', () => 'const createAmbientVideo=' + createAmbientVideo.toString() + ';');
 for (const [token, file, type] of [['BG','cockpit-background.webp','image/webp'],['WHALE','deepseek-hologram.webp','image/webp'],['LOGO','deepseek-mark.png','image/png'],['VIDEO','cockpit-ambient.mp4','video/mp4'],['POSTER','cockpit-ambient-poster.webp','image/webp']]) fragment = fragment.replaceAll('__DS_' + token + '__', await asset(file, type));
 let fonts = '';

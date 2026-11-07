@@ -145,7 +145,6 @@ __DS_FONTS__
 #deepseek-cockpit .dc-home{position:absolute;inset:0;z-index:16;background:#030812;opacity:var(--dc-home,0);overflow:clip}
 #deepseek-cockpit .dc-home-media{position:absolute;top:0;right:0;bottom:0;width:60%;overflow:hidden;background:#06101d}
 #deepseek-cockpit .dc-home-video{position:absolute;width:100%;height:100%;inset:0;object-fit:cover;object-position:center;filter:brightness(.9) saturate(.9)}
-#deepseek-cockpit .dc-home-stars{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen}
 #deepseek-cockpit .dc-home-vignette{position:absolute;inset:0;background:linear-gradient(90deg,#030812 0%,#030812 38%,#030812d9 44%,#03081244 57%,transparent 73%),linear-gradient(180deg,#03081277,transparent 22%,transparent 75%,#030812cc);pointer-events:none}
 #deepseek-cockpit .dc-home-copy{position:absolute;z-index:2;left:6.5%;top:28%;width:40%;max-width:410px}
 #deepseek-cockpit .dc-home-welcome{font:400 26px/1.45 "Inter","PingFang SC",sans-serif;letter-spacing:3px;color:#c3dfef;margin:0 0 19px;opacity:0}
@@ -272,7 +271,7 @@ __DS_AUTH_STYLE__
   </section>
   <section class="dc-granted" hidden inert aria-label="Access granted" data-dc-aria="grantedLabel"><p class="dc-granted-kicker dc-mono" data-dc-text="grantedKicker">AUTHORIZATION COMPLETE / 04</p><h2 data-dc-text="grantedTitle">ACCESS GRANTED</h2><p class="dc-granted-detail" data-dc-text="grantedDetail">Identity confirmed. All cockpit systems are online.</p><div class="dc-entry-command"><button type="button" class="dc-submit dc-enter cursor-interaction"><span class="dc-entry-copy"><span class="dc-entry-label" data-dc-text="enterMain">ENTER DEEPSEEK</span><span class="dc-entry-key" data-dc-text="enterMainHint">YOUR NEXT EXPLORATION AWAITS</span></span><span class="dc-entry-glyph" aria-hidden="true"><i data-lucide="move-right" aria-hidden="true"></i></span><span class="dc-entry-track" aria-hidden="true"></span></button></div></section>
   <section class="dc-home" hidden inert aria-label="DeepSeek main screen" data-dc-aria="homeLabel">
-    <div class="dc-home-media"><video class="dc-home-video" src="__DS_VIDEO__" poster="__DS_POSTER__" muted loop playsinline preload="metadata" aria-label="Animated cockpit background" data-dc-aria="homeVideoLabel"></video><canvas class="dc-home-stars" role="img" aria-label="A small DeepSeek whale dissolves into stars above the cockpit" data-dc-aria="homeWhaleLabel"></canvas></div>
+    <div class="dc-home-media"><video class="dc-home-video" src="__DS_VIDEO__" poster="__DS_POSTER__" muted loop playsinline preload="metadata" aria-label="Cockpit video with a projected whale dissolving into stars" data-dc-aria="homeVideoLabel" data-composition="baked-whale"></video></div>
     <div class="dc-home-vignette" aria-hidden="true"></div>
     <div class="dc-home-copy"><p class="dc-home-welcome" data-dc-text="homeWelcome">WELCOME BACK</p><h1 class="dc-home-title" aria-label="DeepSeek Harness"></h1><p class="dc-home-product" aria-hidden="true"><span class="dc-home-product-word">HARNESS</span></p></div><h2 class="dc-home-headline"></h2>
   </section>
@@ -291,7 +290,7 @@ __DS_AUTH_STYLE__
   const config={language:'en',duration:9,illumination:1,sound:true,identity:'',voiceName:'auto',voiceRate:.88,voicePitch:.85,voiceVolume:.9,voiceLead:240,...window.__DSH_COCKPIT_FRAME__};
   function notify(type,detail={}){parent.postMessage({channel:config._channel,type,...detail},location.origin==='null'?'*':location.origin);}
   window.addEventListener('error',()=>notify('error'));
-  window.addEventListener('message',event=>{if(event.source===parent&&event.data?.channel===config._channel&&event.data.type==='dispose'){state.mode='disposed';state.flowToken++;stopAudio();homeMedia.dispose();homeWhaleStars.stop();authorizationVFX.stop();cancelAnimationFrame(state.frame);context?.close().catch(()=>{});}});
+  window.addEventListener('message',event=>{if(event.source===parent&&event.data?.channel===config._channel&&event.data.type==='dispose'){state.mode='disposed';state.flowToken++;stopAudio();homeMedia.dispose();authorizationVFX.stop();cancelAnimationFrame(state.frame);context?.close().catch(()=>{});}});
   const inspector={reveal:0};
   const state={p:0,frame:0,mode:'loading',lastPhase:-1,lastLoadPulse:-1,linkStep:-1,identityConfirmed:false,permissionAnnounced:false,backgroundType:'generated-video',motionPaused:reduced,ready:false,manualReveal:0,audioUnlocked:false,flowToken:0,speechStatus:{state:'idle',text:''}};
   try{state.audioUnlocked=config.sound&&parent.location.protocol==='dsh-app:';}catch(_){}
@@ -429,7 +428,6 @@ __DS_AUTH_STYLE__
     }
   }
   __DS_AUTH_VFX__
-  __DS_HOME_VFX__
   __DS_MEDIA_ENGINE__
   __DS_ACCESS_FLOW__
   if(config.backgroundImage)scene.src=config.backgroundImage;

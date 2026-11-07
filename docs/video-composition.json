@@ -1,0 +1,50 @@
+{
+  "direction": "Ice-blue point-cloud whale projected from the cockpit core, dispersing into canopy stars",
+  "source": "assets/cockpit-ambient-source.mp4",
+  "sourceSha256": "e3e9cea9b7af57af22dbde9b40f5955234152bbdff31b2ac08e65f6aca4b4aee",
+  "sourceProvenance": "Original project-generated HeyGen cockpit clip; first 8 seconds looped twice at 1x",
+  "output": "assets/cockpit-ambient.mp4",
+  "outputSha256": "b4532ffb7ed5b5b116f16f0536e66ef3f580025685e5d3bd0a88474586fd8c1c",
+  "dimensions": [
+    1344,
+    768
+  ],
+  "fps": 24,
+  "durationSeconds": 16,
+  "audio": "none",
+  "particleCount": 1936,
+  "coordinates": {
+    "projector": [
+      672,
+      587
+    ],
+    "whaleCenter": [
+      672,
+      310
+    ],
+    "whaleScale": 510
+  },
+  "cuesSeconds": {
+    "form": [
+      0.65,
+      2.45
+    ],
+    "hold": [
+      2.45,
+      5.2
+    ],
+    "disperse": [
+      5.2,
+      9.6
+    ],
+    "stars": [
+      9.6,
+      14.5
+    ],
+    "fadeToLoop": [
+      14.5,
+      16
+    ]
+  },
+  "render": "python3 scripts/render_whale_video.py"
+}

@@ -2,6 +2,13 @@ const homeVideo=q('.dc-home-video');
 homeVideo.muted=true;homeVideo.defaultMuted=true;
 const bundledHomeVideo=homeVideo.getAttribute('src'),bundledHomePoster=homeVideo.getAttribute('poster');
 const homeMedia=createAmbientVideo(homeVideo,{source:config.backgroundVideo||(config.backgroundImage?'':bundledHomeVideo),fallback:bundledHomeVideo,poster:config.backgroundImage||bundledHomePoster,reduced,onState:value=>root.dataset.videoState=value});
+// Interface cues follow the baked video's clock, including buffering and loops.
+let homeVideoCue=-1;
+homeVideo.addEventListener('timeupdate',()=>{
+  if(reduced||config.backgroundVideo||config.backgroundImage||!['entering','entered'].includes(state.mode))return;
+  const time=homeVideo.currentTime,next=time<2.45?0:time<5.2?1:time<9.6?2:3;
+  if(next!==homeVideoCue){if(next>0)tone([0,9,5,2][next],.35);homeVideoCue=next;}
+});
 const waitForBeat=milliseconds=>new Promise(resolve=>setTimeout(resolve,milliseconds));
 function setMode(mode){state.mode=mode;root.dataset.phase=mode;}
 function updateHomeCopy(){
@@ -52,7 +59,7 @@ function render(p,quiet=false){
   drawCore(p);drawDust(p);
 }
 function resetUI(){
-  cancelAnimationFrame(state.frame);authorizationVFX.stop();homeWhaleStars.stop();state.lastPhase=-1;state.lastLoadPulse=-1;state.linkStep=-1;state.flowToken++;stopAudio();homeVideo.pause();
+  cancelAnimationFrame(state.frame);authorizationVFX.stop();state.lastPhase=-1;state.lastLoadPulse=-1;state.linkStep=-1;state.flowToken++;stopAudio();homeVideo.pause();homeVideoCue=-1;
   root.classList.remove('dc-key-focused','dc-key-filled','dc-entry-hover','dc-connecting','dc-home-active','dc-preflight');
   root.style.removeProperty('--dc-boot-opacity');set('--dc-home',0);set('--dc-transition',0);set('--dc-transition-y','-100%');
   q('.dc-permission').hidden=true;q('.dc-login').hidden=true;q('.dc-granted').hidden=true;q('.dc-home').hidden=true;q('.dc-home').inert=true;
@@ -119,7 +126,8 @@ function startLoading(){
 function enterHome(){
   if(state.mode!=='granted')return;
   stopAudio();const flow=++state.flowToken;setMode('entering');q('.dc-enter').disabled=true;q('.dc-granted').inert=true;set('--dc-boot-opacity',0);
-  q('.dc-home').hidden=false;q('.dc-home').inert=true;updateHomeCopy();playHomeBackground();homeWhaleStars.start();tone(5);
+  q('.dc-home').hidden=false;q('.dc-home').inert=true;updateHomeCopy();
+  try{homeVideo.currentTime=0;}catch(_){}playHomeBackground();tone(5);
   state.welcomePending=true;state.welcomeSpeech=narrate('Welcome back, DeepSeek Harness.').then(()=>{state.welcomePending=false;notify('welcomeComplete');});
   const started=performance.now();
   function tick(time){

@@ -16,6 +16,21 @@ const index = '<!doctype html><html><head><meta charset="utf-8"><meta name="view
 const server = http.createServer(async (req, res) => {
   try {
     const pathname = new URL(req.url, 'http://localhost').pathname;
+    if (pathname === '/welcome-preview') {
+      // Development-only route. Production still uses both confirmation gates.
+      const html = (await fs.readFile(new URL('../lib/scene.html', import.meta.url), 'utf8'))
+        .replace('/*__COCKPIT_CONFIG__*/', 'window.__DSH_COCKPIT_FRAME__={sound:false};')
+        .replace('observer.disconnect();beginAccess();', 'observer.disconnect();reviewProgress(100);enterHome();');
+      res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.end(html); return;
+    }
+    if (pathname === '/layout-preview') {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.end(`<!doctype html><html><head><meta charset="utf-8"><title>Cockpit viewport review</title>
+      <style>body{margin:0;background:#17202c;color:#d2e5f6;font:14px system-ui}header{padding:14px;display:flex;gap:12px;align-items:center}button,select{font:inherit;padding:7px}#stage{margin:0 14px;overflow:hidden}iframe{border:0;display:block;transform-origin:top left}</style></head>
+      <body><header><label>Preview size <select aria-label="Preview size"><option value="1920,1080">1920 × 1080</option><option value="3840,2160">3840 × 2160 · 4K</option><option value="3440,1440">3440 × 1440 · Ultrawide</option><option value="1024,768">1024 × 768</option><option value="375,812">375 × 812 · Mobile</option></select></label><button data-time="3">Whale · 3 s</button><button data-time="7.5">Dispersal · 7.5 s</button><button data-time="11">Stars · 11 s</button><button id="play">Play</button></header>
+      <div id="stage"><iframe title="Welcome layout" src="/welcome-preview"></iframe></div>
+      <script>const frame=document.querySelector('iframe'),select=document.querySelector('select'),stage=document.querySelector('#stage');function fit(){const [w,h]=select.value.split(',').map(Number),scale=Math.min((innerWidth-28)/w,(innerHeight-80)/h,1);frame.style.width=w+'px';frame.style.height=h+'px';frame.style.transform='scale('+scale+')';stage.style.width=w*scale+'px';stage.style.height=h*scale+'px'}select.onchange=fit;window.onresize=fit;fit();for(const button of document.querySelectorAll('[data-time]'))button.onclick=()=>{const video=frame.contentDocument.querySelector('.dc-home-video');video.playbackRate=0;video.currentTime=Number(button.dataset.time)};document.querySelector('#play').onclick=()=>{const video=frame.contentDocument.querySelector('.dc-home-video');video.playbackRate=1;video.play()};</script></body></html>`); return;
+    }
     if (pathname === '/mobile-preview') {
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.end('<!doctype html><html><head><meta charset="utf-8"><title>Mobile cockpit preview</title></head><body style="margin:0;background:#202938;display:flex;justify-content:center"><iframe title="Mobile preview" src="/" style="width:375px;height:812px;border:0"></iframe></body></html>'); return;
