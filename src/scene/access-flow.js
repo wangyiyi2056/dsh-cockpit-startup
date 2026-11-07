@@ -1,5 +1,7 @@
 const homeVideo=q('.dc-home-video');
 homeVideo.muted=true;homeVideo.defaultMuted=true;
+const bundledHomeVideo=homeVideo.getAttribute('src'),bundledHomePoster=homeVideo.getAttribute('poster');
+const homeMedia=createAmbientVideo(homeVideo,{source:config.backgroundVideo||(config.backgroundImage?'':bundledHomeVideo),fallback:bundledHomeVideo,poster:config.backgroundImage||bundledHomePoster,reduced,onState:value=>root.dataset.videoState=value});
 const waitForBeat=milliseconds=>new Promise(resolve=>setTimeout(resolve,milliseconds));
 function setMode(mode){state.mode=mode;root.dataset.phase=mode;}
 function updateHomeCopy(){
@@ -20,7 +22,7 @@ function updateHomeCopy(){
 }
 function playHomeBackground(){
   if(state.motionPaused||document.hidden)return;
-  homeVideo.muted=true;homeVideo.play().catch(()=>{state.motionPaused=true;});
+  homeMedia.play();
 }
 function render(p,quiet=false){
   state.p=clamp(p);p=state.p;
@@ -63,12 +65,15 @@ function beginAccess(){
   resetUI();state.identityConfirmed=false;state.permissionAnnounced=false;setMode('permission');root.classList.add('dc-preflight');render(0,true);set('--dc-scene-light',.53*config.illumination);
   q('.dc-permission').hidden=false;q('.dc-boot-copy').hidden=true;refreshAccessCopy();
   authorizationVFX.show(q('.dc-permission'),'permission');
+  if(state.audioUnlocked)narration.unlock();
   announcePermission();
   notify('ready');q('.dc-permit').focus({preventScroll:true});
 }
 function announcePermission(){
-  if(state.permissionAnnounced||!['permission','permitting'].includes(state.mode)||!config.sound||!state.audioUnlocked||document.hidden)return;
-  state.permissionAnnounced=true;narrate('Access permission required.');
+  if(state.permissionAnnounced)return state.permissionSpeech||Promise.resolve();
+  if(!['permission','permitting'].includes(state.mode)||!config.sound||!state.audioUnlocked||document.hidden)return Promise.resolve();
+  state.permissionAnnounced=true;state.permissionSpeech=narrate('Access permission required.').then(result=>{if(result==='not-allowed'){state.permissionAnnounced=false;state.audioUnlocked=false;}return result;});
+  return state.permissionSpeech;
 }
 async function lockGate(gate,flow,mode,confirmationSpeech=''){
   if(flow!==state.flowToken||state.mode!==mode)return false;
@@ -81,7 +86,7 @@ async function lockGate(gate,flow,mode,confirmationSpeech=''){
 async function confirmPermission(){
   if(state.mode!=='permission')return;
   const flow=++state.flowToken,gate=q('.dc-permission');setMode('permitting');q('.dc-permit').disabled=true;gate.setAttribute('aria-busy','true');gate.classList.add('dc-gate-processing');authorizationVFX.charge();refreshAccessCopy();tone(1);
-  await waitForBeat(Math.max(reduced?100:1550,authorizationVFX.remainingReveal()));
+  await Promise.all([waitForBeat(Math.max(reduced?100:1550,authorizationVFX.remainingReveal())),announcePermission()]);
   if(!await lockGate(gate,flow,'permitting'))return;
   setMode('identity');q('.dc-permission').hidden=true;q('.dc-login').hidden=false;q('.dc-login').inert=false;q('.dc-login').setAttribute('aria-hidden','false');
   set('--dc-form',1);authorizationVFX.show(q('.dc-login'),'identity');refreshAccessCopy();q('.dc-confirm').focus({preventScroll:true});narrate('Confirm ID.');save();
@@ -114,7 +119,8 @@ function startLoading(){
 function enterHome(){
   if(state.mode!=='granted')return;
   stopAudio();const flow=++state.flowToken;setMode('entering');q('.dc-enter').disabled=true;q('.dc-granted').inert=true;set('--dc-boot-opacity',0);
-  q('.dc-home').hidden=false;q('.dc-home').inert=true;updateHomeCopy();playHomeBackground();homeWhaleStars.start();tone(5);narrate('Welcome back.');
+  q('.dc-home').hidden=false;q('.dc-home').inert=true;updateHomeCopy();playHomeBackground();homeWhaleStars.start();tone(5);
+  state.welcomePending=true;state.welcomeSpeech=narrate('Welcome back, DeepSeek Harness.').then(()=>{state.welcomePending=false;notify('welcomeComplete');});
   const started=performance.now();
   function tick(time){
     if(flow!==state.flowToken||state.mode!=='entering')return;
@@ -122,7 +128,7 @@ function enterHome(){
     set('--dc-home',ease(ramp(t,.12,1)));set('--dc-form',1-ease(ramp(t,0,.55)));
     set('--dc-transition',Math.sin(t*Math.PI)*.55);set('--dc-transition-y',(-90+t*180)+'%');
     if(t>=.35)root.classList.add('dc-home-active');
-    if(t>=1){setMode('entered');q('.dc-home').inert=false;q('.dc-home').tabIndex=-1;q('.dc-home').focus({preventScroll:true});q('.dc-granted').hidden=true;q('.dc-bottom-brand').hidden=true;q('.dc-boot-copy').hidden=true;set('--dc-transition',0);save();notify('home',{reduced});return;}
+    if(t>=1){setMode('entered');q('.dc-home').inert=false;q('.dc-home').tabIndex=-1;q('.dc-home').focus({preventScroll:true});q('.dc-granted').hidden=true;q('.dc-bottom-brand').hidden=true;q('.dc-boot-copy').hidden=true;set('--dc-transition',0);save();notify('home',{reduced,voicePending:state.welcomePending});return;}
     state.frame=requestAnimationFrame(tick);
   }
   state.frame=requestAnimationFrame(tick);
@@ -148,13 +154,13 @@ for(const command of qa('.dc-submit')){
 }
 q('.dc-skip').addEventListener('click',()=>{if(state.mode==='booting'||state.mode==='review')finishStartup();});
 function unlockOnInteraction(event){
-  if(state.audioUnlocked||!config.sound||event.target.closest('.dc-sound'))return;
+  if(!config.sound||event.target.closest('.dc-sound'))return;
   state.audioUnlocked=true;updateSound();narration.load();narration.unlock();announcePermission();
 }
 root.addEventListener('pointerdown',unlockOnInteraction,{capture:true});root.addEventListener('keydown',unlockOnInteraction,{capture:true});
 q('.dc-language').addEventListener('click',()=>{config.language=config.language==='en'?'zh':'en';applyLocale();save();});
 q('.dc-sound').addEventListener('click',()=>{state.audioUnlocked=true;config.sound=!config.sound;stopAudio();updateSound();if(config.sound){narration.load();narration.unlock();tone(1);announcePermission();}save();});
-document.addEventListener('keydown',event=>{
+document.addEventListener('keydown',async event=>{
   if(event.key==='Escape'){event.preventDefault();stopAudio();notify('exit');}
-  else if(event.key==='Enter'&&state.mode==='entered'){event.preventDefault();notify('exit');}
+  else if(event.key==='Enter'&&state.mode==='entered'){event.preventDefault();await state.welcomeSpeech;if(state.mode==='entered')notify('exit');}
 });

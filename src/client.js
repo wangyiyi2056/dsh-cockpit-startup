@@ -1,9 +1,9 @@
 // ModuleLoader factory, serialized by build.mjs; no client-side node imports.
-export function clientFactory(require, mountCockpit, sceneHtml, defaults, version) {
+export function clientFactory(require, mountCockpit, sceneHtml, defaults, version, installBackground, createAmbientVideo, normalizeConfig) {
   const React = require('react'), h = React.createElement;
   const storageKey = 'dsh-cockpit-startup:config', preferencesKey = 'dsh-cockpit-startup:preferences';
   const API = '/dsh-cockpit/config';
-  const readLocal = () => { try { return { ...defaults, ...JSON.parse(localStorage.getItem(storageKey) || '{}') }; } catch { return { ...defaults }; } };
+  const readLocal = () => { try { return normalizeConfig(JSON.parse(localStorage.getItem(storageKey) || '{}')); } catch { return { ...defaults }; } };
   let alive = true, currentRuntime = null;
   const pending = new Set();
   async function request(method, payload) {
@@ -54,11 +54,12 @@ export function clientFactory(require, mountCockpit, sceneHtml, defaults, versio
       field('mode', t('Show startup', '播放时机'), [['session', t('Once per browser session', '每个浏览器会话一次')], ['always', t('Every page load', '每次打开')], ['daily', t('Once per day', '每天一次')]]),
       field('identity', t('Identity name (empty = Explorer 01)', '身份名称（留空使用默认探索者）')),
       check('sound', t('Narration and interface sounds', '语音播报与界面音效')),
+      check('workspaceBackground', t('Keep cockpit video as workspace wallpaper', '进入控制台后继续使用驾驶舱动态背景')),
       range('duration', t('Loading duration', '加载时长'), 8, 16),
       range('welcomeDuration', t('Welcome screen duration', '欢迎画面停留'), 10, 30),
       field('backgroundImage', t('Background image URL (optional)', '背景图片地址（可选）')),
       field('backgroundVideo', t('Background video URL (optional)', '背景视频地址（可选）')),
-      h('small', null, t('Use an HTTPS URL or a same-origin /path. Leave empty for the included cockpit. Press Escape to enter the workspace at any time.', '使用 HTTPS 地址或同源 /路径。留空使用内置驾驶舱。随时按 Esc 可进入工作区。')),
+      h('small', null, t('Use an HTTPS URL or a URL served by Harness. A computer file path is not a web URL. Leave empty for the bundled video.', '使用 HTTPS 地址或 Harness 提供的网页路径，不能填写电脑上的文件路径。留空使用内置动态背景。')),
       localOnly ? h('small', null, t('Client fallback: settings are saved in this browser.', '客户端回退模式：设置保存在当前浏览器。')) : null,
       h('div', { className: 'dshcp-actions' }, h('button', { disabled: busy, onClick: () => save() }, t('Save', '保存')), h('button', { disabled: busy, onClick: () => save(true) }, t('Restore defaults', '恢复默认'))),
       h('div', { role: 'status' }, status)
@@ -68,7 +69,7 @@ export function clientFactory(require, mountCockpit, sceneHtml, defaults, versio
     inject: ['slots'],
     apply(ctx) {
       if (!window.__DSH_COCKPIT_RUNTIME__ && !document.getElementById('dsh-cockpit-root')) {
-        request('GET').catch(readLocal).then(config => { if (alive) currentRuntime = mountCockpit(sceneHtml, config); });
+        request('GET').catch(readLocal).then(config => { if (alive) currentRuntime = mountCockpit(sceneHtml, normalizeConfig(config), installBackground, createAmbientVideo); });
       }
       ctx.slots.inject('settings.section', () => ctx.slots.register({ name: 'settings.section', id: 'cockpit-startup', order: 26, label: 'DeepSeek Cockpit' }, () => h(Panel)));
       ctx.effect(() => () => {

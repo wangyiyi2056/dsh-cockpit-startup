@@ -249,7 +249,7 @@ __DS_AUTH_STYLE__
   <img class="dc-scene" src="__DS_BG__" alt="Armored mech cockpit with blue lighting and a central holographic emitter" data-dc-alt="sceneAlt">
   <div class="dc-powered" aria-hidden="true"></div><div class="dc-contrast" aria-hidden="true"></div><div class="dc-toplight" aria-hidden="true"></div>
   <canvas class="dc-ambience" aria-hidden="true"></canvas><canvas class="dc-auth-canvas" aria-hidden="true" hidden></canvas>
-  <header class="dc-header"><div class="dc-brand"><img src="__DS_LOGO__" alt="DeepSeek"><div><div class="dc-brand-name">deepseek</div><div class="dc-brand-caption" data-dc-text="brandCaption">COCKPIT ACCESS</div></div></div><div class="dc-top-controls"><button type="button" class="dc-text-button dc-language cursor-interaction" aria-label="Switch to Chinese" data-dc-aria="switchLanguage"><i data-lucide="languages" aria-hidden="true"></i><span data-dc-text="language">EN</span></button><button type="button" class="dc-text-button dc-sound cursor-interaction" aria-label="Mute narration" aria-pressed="true"><i data-lucide="audio-lines" aria-hidden="true"></i></button><button type="button" class="dc-text-button dc-skip" hidden><span data-dc-text="skip">Skip sequence</span><i data-lucide="arrow-up-right" aria-hidden="true"></i></button></div></header>
+  <header class="dc-header"><div class="dc-brand"><img src="__DS_LOGO__" alt="DeepSeek"><div class="dc-brand-name">deepseek</div></div><div class="dc-top-controls"><button type="button" class="dc-text-button dc-language cursor-interaction" aria-label="Switch to Chinese" data-dc-aria="switchLanguage"><i data-lucide="languages" aria-hidden="true"></i><span data-dc-text="language">EN</span></button><button type="button" class="dc-text-button dc-sound cursor-interaction" aria-label="Mute narration" aria-pressed="true"><i data-lucide="audio-lines" aria-hidden="true"></i></button><button type="button" class="dc-text-button dc-skip" hidden><span data-dc-text="skip">Skip sequence</span><i data-lucide="arrow-up-right" aria-hidden="true"></i></button></div></header>
   <div class="dc-projector" aria-hidden="true"></div><div class="dc-emitter-light" aria-hidden="true"></div>
   <div class="dc-core-anchor" role="img" aria-label="DeepSeek crystal whale reconstructed from holographic particles" data-dc-aria="coreLabel"><div class="dc-core-aura" aria-hidden="true"></div><canvas class="dc-core-particles" aria-hidden="true"></canvas><img class="dc-whale" src="__DS_WHALE__" alt="DeepSeek whale in blue optical crystal" data-dc-alt="whaleAlt"><div class="dc-core-scan" aria-hidden="true"></div><div class="dc-projection-caption dc-mono" data-dc-text="coreCaption" aria-hidden="true">DEEPSEEK · NEURAL CORE</div></div>
   <svg class="dc-connectors" viewBox="0 0 1024 760" preserveAspectRatio="none" aria-hidden="true"><path d="M204 314H261L316 268H373M204 377H276L326 404H368M812 323H755L699 284H658M812 388H758L709 420H660"/><circle cx="373" cy="268" r="2"/><circle cx="368" cy="404" r="2"/><circle cx="658" cy="284" r="2"/><circle cx="660" cy="420" r="2"/></svg>
@@ -259,11 +259,10 @@ __DS_AUTH_STYLE__
   <section class="dc-boot-copy" aria-label="Startup progress" data-dc-aria="bootLabel"><div class="dc-boot-kicker dc-mono" data-dc-text="bootKicker">SYSTEM INITIALIZATION</div><h1 class="dc-phase-title">POWERING UP</h1><p class="dc-boot-detail" aria-live="polite">Bringing cockpit lighting and primary power online.</p><div class="dc-loader"><div class="dc-loader-meta dc-mono"><span class="dc-phase-code">01 / POWER ON</span><span><span class="dc-percent">00</span>%</span></div><div class="dc-loader-track" role="progressbar" aria-label="Cockpit startup progress" data-dc-aria="progressLabel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div></div></section>
   <div class="dc-bottom-brand" aria-hidden="true"><h2 class="dc-explore" data-dc-text="explore">SEEK BEYOND</h2><div class="dc-explore-en dc-mono" data-dc-text="exploreSub">INTO THE UNKNOWN</div><div class="dc-micro-line"></div><p class="dc-explore-detail" data-dc-text="exploreDetail">Your next discovery begins here.</p></div>
   <section class="dc-permission" hidden aria-label="Access permission required" data-dc-aria="permissionLabel">
-    <div class="dc-gate-kicker dc-mono" data-dc-text="permissionKicker">01 / ACCESS</div><div class="dc-auth-anchor" aria-hidden="true">__DS_WHALE_LINEWORK__</div><h1 data-dc-text="permissionTitle">ACCESS REQUEST</h1>
+    <div class="dc-auth-anchor" aria-hidden="true">__DS_WHALE_LINEWORK__</div><h1 data-dc-text="permissionTitle">ACCESS REQUEST</h1>
     <div class="dc-entry-command"><button type="button" class="dc-submit dc-permit cursor-interaction" aria-label="Confirm access permission"><span class="dc-entry-copy"><span class="dc-entry-label">AUTHORIZE</span></span><span class="dc-entry-glyph" aria-hidden="true"><span class="dc-command-arrow"><i data-lucide="move-right"></i></span><span class="dc-command-check"><i data-lucide="check"></i></span></span><span class="dc-entry-track" aria-hidden="true"></span></button></div><span class="dc-gate-status" role="status"></span>
   </section>
   <section class="dc-login" hidden inert aria-label="DeepSeek identity access" data-dc-aria="accessLabel">
-    <p class="dc-gate-kicker dc-mono" data-dc-text="identityKicker">02 / IDENTITY</p>
     <div class="dc-auth-anchor" aria-hidden="true"></div>
     <div class="dc-form">
       <dl class="dc-credentials"><div class="dc-credential"><dt data-dc-text="name">NAME</dt><dd class="dc-credential-name" data-dc-text="identity">EXPLORER 01</dd></div><div class="dc-credential"><dt data-dc-text="password">PASSWORD</dt><dd class="dc-credential-key" aria-label="Default password loaded" data-dc-aria="defaultKeyLabel">••••••••</dd></div></dl>
@@ -289,12 +288,13 @@ __DS_AUTH_STYLE__
   const particlesCanvas=q('.dc-core-particles'),particles=particlesCanvas.getContext('2d');
   const dustCanvas=q('.dc-ambience'),dust=dustCanvas.getContext('2d');
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const config={language:'en',duration:11,illumination:1,sound:true,identity:'',voiceName:'auto',voiceRate:.88,voicePitch:.85,voiceVolume:.9,voiceLead:240,...window.__DSH_COCKPIT_FRAME__};
+  const config={language:'en',duration:9,illumination:1,sound:true,identity:'',voiceName:'auto',voiceRate:.88,voicePitch:.85,voiceVolume:.9,voiceLead:240,...window.__DSH_COCKPIT_FRAME__};
   function notify(type,detail={}){parent.postMessage({channel:config._channel,type,...detail},location.origin==='null'?'*':location.origin);}
   window.addEventListener('error',()=>notify('error'));
-  window.addEventListener('message',event=>{if(event.source===parent&&event.data?.channel===config._channel&&event.data.type==='dispose'){stopAudio();homeVideo.pause();homeWhaleStars.stop();authorizationVFX.stop();cancelAnimationFrame(state.frame);context?.close().catch(()=>{});}});
+  window.addEventListener('message',event=>{if(event.source===parent&&event.data?.channel===config._channel&&event.data.type==='dispose'){state.mode='disposed';state.flowToken++;stopAudio();homeMedia.dispose();homeWhaleStars.stop();authorizationVFX.stop();cancelAnimationFrame(state.frame);context?.close().catch(()=>{});}});
   const inspector={reveal:0};
   const state={p:0,frame:0,mode:'loading',lastPhase:-1,lastLoadPulse:-1,linkStep:-1,identityConfirmed:false,permissionAnnounced:false,backgroundType:'generated-video',motionPaused:reduced,ready:false,manualReveal:0,audioUnlocked:false,flowToken:0,speechStatus:{state:'idle',text:''}};
+  try{state.audioUnlocked=config.sound&&parent.location.protocol==='dsh-app:';}catch(_){}
   document.fonts?.load('italic 500 90px "Chakra Petch"').catch(()=>{});
   document.fonts?.load('500 22px "Chakra Petch"').catch(()=>{});
   __DS_INTERFACE_COPY__
@@ -430,10 +430,9 @@ __DS_AUTH_STYLE__
   }
   __DS_AUTH_VFX__
   __DS_HOME_VFX__
+  __DS_MEDIA_ENGINE__
   __DS_ACCESS_FLOW__
-  if(config.backgroundImage){scene.src=config.backgroundImage;homeVideo.poster=config.backgroundImage;}
-  if(config.backgroundVideo){homeVideo.src=config.backgroundVideo;}
-  else if(config.backgroundImage){homeVideo.removeAttribute('src');homeVideo.load();}
+  if(config.backgroundImage)scene.src=config.backgroundImage;
   applyLocale();narration.load();root.classList.toggle('dc-reduced-motion',reduced);
   root.style.setProperty('--dc-scene-url','url("'+scene.src+'")');
   new ResizeObserver(dimensions).observe(root);
@@ -446,7 +445,7 @@ __DS_AUTH_STYLE__
     },{threshold:.15});
     observer.observe(root);
   });
-  window.addEventListener('pagehide',()=>{stopAudio();homeVideo.pause();});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){stopAudio();homeVideo.pause();}else if(state.mode==='entered')playHomeBackground();});
+  window.addEventListener('pagehide',()=>{stopAudio();homeMedia.dispose();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){stopAudio();homeVideo.pause();}else if(state.mode==='entered')playHomeBackground();else if(state.mode==='permission')announcePermission();});
 })();
 </script>

@@ -16,6 +16,13 @@ test('configuration rejects unsafe media and clamps untrusted values', () => {
   assert.equal(normalize({ backgroundImage: 'file:///etc/passwd' }).backgroundImage, '');
 });
 
+test('legacy desktop poster paths no longer suppress the bundled video, and loading is two seconds faster', () => {
+  const legacy = normalize({ duration: 11, backgroundImage: '/Users/example/plugin/assets/cockpit-ambient-poster.webp' });
+  assert.equal(legacy.duration, 9); assert.equal(legacy.backgroundImage, ''); assert.equal(legacy.workspaceBackground, true); assert.equal(legacy.configVersion, 2);
+  assert.equal(normalize({ configVersion: 2, duration: 11 }).duration, 11, 'A new explicit duration remains configurable');
+  assert.equal(normalize({ backgroundImage: 'C:\\Users\\example\\poster.webp' }).backgroundImage, '');
+});
+
 test('real HTTP routes, trust boundary, index hook, persistence and disposal', async () => {
   const home = await fs.mkdtemp(path.join(os.tmpdir(), 'dsh-cockpit-test-'));
   const old = process.env.DSH_HOME; process.env.DSH_HOME = home;

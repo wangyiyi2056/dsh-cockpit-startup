@@ -1,15 +1,22 @@
 // Self-contained: this function is serialized into both host and client bundles.
-export function mountCockpit(sceneHtml, input) {
+export function mountCockpit(sceneHtml, input, installBackground, createAmbientVideo) {
   const key = 'dsh-cockpit-startup';
   if (window.__DSH_COCKPIT_RUNTIME__) return window.__DSH_COCKPIT_RUNTIME__;
-  const cfg = { enabled: true, mode: 'session', language: 'en', sound: true, welcomeDuration: 12, ...input };
+  const cfg = { enabled: true, mode: 'session', language: 'en', sound: true, workspaceBackground: true, welcomeDuration: 12, ...input };
   const read = (store, name) => { try { return window[store].getItem(key + ':' + name); } catch { return null; } };
   const write = (store, name, value) => { try { window[store].setItem(key + ':' + name, value); } catch {} };
   const today = new Date().toLocaleDateString('en-CA');
   const placeholder = document.getElementById('dsh-cockpit-root');
   const critical = document.getElementById('dsh-cockpit-critical');
+  const bundledVideo = sceneHtml.match(/class="dc-home-video" src="([^"]+)"/)?.[1] || '';
+  const bundledPoster = sceneHtml.match(/class="dc-home-video"[^>]*poster="([^"]+)"/)?.[1] || '';
+  const media = { source: cfg.backgroundVideo || (cfg.backgroundImage ? '' : bundledVideo), fallback: bundledVideo, poster: cfg.backgroundImage || bundledPoster };
+  const background = cfg.enabled && cfg.workspaceBackground ? installBackground?.(media, cfg, createAmbientVideo) : null;
   if (!cfg.enabled || (cfg.mode === 'session' && read('sessionStorage', 'shown') === '1') || (cfg.mode === 'daily' && read('localStorage', 'day') === today)) {
-    placeholder?.remove(); critical?.remove(); return null;
+    placeholder?.remove(); critical?.remove(); background?.reveal();
+    if (!background) return null;
+    const api = { dispose() { background.dispose(); delete window.__DSH_COCKPIT_RUNTIME__; }, ready: false };
+    window.__DSH_COCKPIT_RUNTIME__ = api; return api;
   }
   try {
     const preferences = JSON.parse(read('localStorage', 'preferences') || '{}');
@@ -39,17 +46,21 @@ export function mountCockpit(sceneHtml, input) {
   frame.title = 'DeepSeek Harness cockpit'; frame.allow = 'autoplay';
   frame.style.cssText = 'border:0;width:100%;height:100%;display:block;background:#030710;';
   const channel = crypto.randomUUID();
-  let disposed = false, ready = false, closing = false, welcomeTimer = 0, removeTimer = 0;
+  let disposed = false, ready = false, closing = false, welcomeTimer = 0, removeTimer = 0, welcomeTimeDone = false, welcomeVoiceDone = true;
   function finalize() {
     if (disposed) return; disposed = true; clearTimeout(removeTimer); clearTimeout(watchdog); clearTimeout(welcomeTimer);
     observer.disconnect(); window.removeEventListener('message', onMessage); window.removeEventListener('pagehide', onPageHide);
     root.remove(); critical?.remove();
+    background?.reveal();
     document.documentElement.style.overflow = previousOverflow;
-    for (const [element, wasInert] of inertRecords) element.inert = wasInert;
+    // Only undo the state this overlay owns. Another host overlay may have
+    // released an element that was already inert when we first saw it.
+    for (const [element, wasInert] of inertRecords) if (!wasInert) element.inert = false;
     if (previousFocus?.isConnected && !previousFocus.inert) previousFocus.focus?.({ preventScroll: true });
   }
   function dispose(immediate = false) {
-    if (disposed || closing) return;
+    if (disposed) return;
+    if (closing) { if (immediate) finalize(); return; }
     closing = true;
     frame.contentWindow?.postMessage({ channel, type: 'dispose' }, '*');
     if (immediate) { finalize(); return; }
@@ -68,17 +79,20 @@ export function mountCockpit(sceneHtml, input) {
       if (next && ['en', 'zh'].includes(next.language) && typeof next.sound === 'boolean') write('localStorage', 'preferences', JSON.stringify({ language: next.language, sound: next.sound }));
     } else if (message.type === 'home') {
       root.dataset.home = 'true'; clearTimeout(welcomeTimer);
-      welcomeTimer = setTimeout(() => dispose(), message.reduced ? 2000 : Math.min(30, Math.max(10, Number(cfg.welcomeDuration) || 12)) * 1000);
+      welcomeVoiceDone = message.voicePending !== true;
+      welcomeTimer = setTimeout(() => { welcomeTimeDone = true; if (welcomeVoiceDone) dispose(); }, message.reduced ? 2000 : Math.min(30, Math.max(10, Number(cfg.welcomeDuration) || 12)) * 1000);
+    } else if (message.type === 'welcomeComplete') {
+      welcomeVoiceDone = true; if (welcomeTimeDone) dispose();
     } else if (message.type === 'exit' || message.type === 'error') dispose(message.type === 'error');
   }
   const watchdog = setTimeout(() => { if (!ready) dispose(true); }, 15000);
-  function onPageHide() { dispose(true); }
+  function onPageHide() { dispose(true); background?.dispose(); }
   window.addEventListener('message', onMessage); window.addEventListener('pagehide', onPageHide);
   const json = JSON.stringify({ ...cfg, _channel: channel }).replace(/</g, '\\u003c');
   frame.srcdoc = sceneHtml.replace('/*__COCKPIT_CONFIG__*/', 'window.__DSH_COCKPIT_FRAME__=' + json + ';');
   root.replaceChildren(frame);
   frame.focus();
-  const api = { dispose(immediate = false) { dispose(immediate); if (immediate) delete window.__DSH_COCKPIT_RUNTIME__; }, get ready() { return ready; } };
+  const api = { dispose(immediate = false) { dispose(immediate); if (immediate) { background?.dispose(); delete window.__DSH_COCKPIT_RUNTIME__; } }, get ready() { return ready; } };
   window.__DSH_COCKPIT_RUNTIME__ = api;
   return api;
 }
