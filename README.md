@@ -10,9 +10,21 @@ DeepSeek Harness 的机甲驾驶舱启动插件。默认英文，支持中文切
 
 ## 安装
 
-### 直接通过 dsh 添加（推荐）
+### 在 Harness 的“添加插件”中安装（推荐）
 
-无需提前下载文件。先至少启动过一次 DeepSeek Harness 桌面端，让它初始化 `desktop` profile；完全退出桌面端后，在终端执行：
+打开 Harness 的 **插件 → 添加插件**，在包名或地址输入框中，**只粘贴下面这一行地址**：
+
+```text
+https://github.com/wangyiyi2056/dsh-cockpit-startup/releases/download/v1.0.0/dsh-cockpit-startup-1.0.0.tgz
+```
+
+点击安装，完成后重新打开 Harness，即可播放启动画面。无需提前下载文件。
+
+**这个输入框里不要填写 `dsh plugin --profile desktop add`。** 它是终端命令的前缀，一起粘贴会出现“无法识别这个包名或地址：not a package name the registry accepts”。复制时也不要带上反引号或 Markdown 链接格式。
+
+### 在终端中通过 dsh 添加
+
+如果使用终端，则运行下面的完整命令。先至少启动过一次 DeepSeek Harness 桌面端，让它初始化 `desktop` profile；完全退出桌面端后执行：
 
 ```bash
 dsh plugin --profile desktop add https://github.com/wangyiyi2056/dsh-cockpit-startup/releases/download/v1.0.0/dsh-cockpit-startup-1.0.0.tgz
@@ -28,6 +40,11 @@ dsh plugin --profile web add https://github.com/wangyiyi2056/dsh-cockpit-startup
 Web 用户请在执行前停止正在运行的 `dsh web`，安装完成后重新启动。自定义 profile 将命令中的 `desktop` 或 `web` 换成实际使用的名称。
 
 插件目前通过 GitHub Release 分发，请使用上面的完整地址添加。安装包已包含构建好的代码、背景、视频和字体。
+
+| 使用位置 | 填写内容 |
+| --- | --- |
+| Harness“添加插件”输入框 | 仅填写 `https://…/dsh-cockpit-startup-1.0.0.tgz` 完整地址 |
+| 系统终端 | 执行 `dsh plugin --profile desktop add <完整地址>` 完整命令 |
 
 如果已安装社区 `dsh-startup-screen`，先在对应 profile 的插件管理中停用它，避免两个启动画面同时覆盖。
 
