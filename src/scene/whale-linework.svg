@@ -1,0 +1,9 @@
+<svg class="dc-whale-vector" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" aria-hidden="true" data-whale-state="tracing" data-draw-duration="2.3" data-fill-mode="body-points" data-reveal-height="__DS_WHALE_HEIGHT__">
+  <defs>
+    <linearGradient id="dc-auth-whale-ink" x1="58" y1="65" x2="454" y2="459" gradientUnits="userSpaceOnUse"><stop stop-color="#d7ffff"/><stop offset=".35" stop-color="#32e5ff"/><stop offset=".72" stop-color="#42baff"/><stop offset="1" stop-color="#6692ff"/></linearGradient>
+    <pattern id="dc-whale-point-grid" patternUnits="userSpaceOnUse" width="6" height="10.392"><circle cx="1.5" cy="2.598" r="1.25" fill="#fff"/><circle cx="4.5" cy="7.794" r="1.25" fill="#fff"/></pattern>
+    <mask id="dc-whale-point-field" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512" style="mask-type:luminance"><rect width="512" height="512" fill="url(#dc-whale-point-grid)"/></mask>
+    <clipPath id="dc-whale-body-reveal" clipPathUnits="userSpaceOnUse"><rect class="dc-whale-reveal-plane" x="-16" y="__DS_WHALE_TOP__" width="544" height="0"/></clipPath>
+  </defs>
+  <path class="dc-whale-point-body" d="__DS_WHALE_BODY__" fill="url(#dc-auth-whale-ink)" fill-rule="evenodd" stroke="none" mask="url(#dc-whale-point-field)" clip-path="url(#dc-whale-body-reveal)"/>
+</svg>

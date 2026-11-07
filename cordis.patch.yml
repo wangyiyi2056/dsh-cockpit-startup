@@ -1,0 +1,4 @@
+# Host plugin layer. The browser bundle is declared by package.json dsh.client.
+- insert:
+    - id: dsh-cockpit-startup
+      name: dsh-cockpit-startup

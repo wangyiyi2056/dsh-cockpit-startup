@@ -1,0 +1,61 @@
+#deepseek-cockpit .dc-auth-canvas{position:absolute;inset:0;z-index:9;width:100%;height:100%;pointer-events:none}
+#deepseek-cockpit.dc-preflight .dc-permission,#deepseek-cockpit.dc-preflight .dc-login{position:absolute;z-index:12;top:19.5%;left:50%;right:auto;width:480px;max-width:calc(100% - 64px);margin:0;padding:0 38px 24px;transform:translateX(-50%);pointer-events:auto;text-shadow:0 2px 18px #020813;animation:dc-auth-arrive .8s cubic-bezier(.2,.7,.2,1) both}
+#deepseek-cockpit.dc-preflight .dc-permission{text-align:center}
+#deepseek-cockpit .dc-gate-kicker{display:flex;align-items:center;justify-content:center;gap:20px;font:400 11px/1.6 "SFMono-Regular",Consolas,monospace;letter-spacing:3px;color:#ffc177;margin:0}
+#deepseek-cockpit .dc-gate-kicker::before,#deepseek-cockpit .dc-gate-kicker::after{content:"";height:1px;width:55px;background:linear-gradient(90deg,transparent,#ffa64b88);transform:skewX(-35deg)}
+#deepseek-cockpit .dc-gate-kicker::after{transform:rotate(180deg) skewX(-35deg)}
+#deepseek-cockpit .dc-auth-anchor{position:relative;height:245px;pointer-events:none}
+#deepseek-cockpit .dc-whale-vector{position:absolute;display:block;left:50%;top:50%;width:min(330px,calc(100% + 48px));height:auto;aspect-ratio:1;overflow:visible;transform:translate(-50%,-50%);filter:drop-shadow(0 0 calc(3px + var(--dc-whale-flash,0)*13px) var(--dc-whale-glow,#5adfff));pointer-events:none}
+#deepseek-cockpit .dc-whale-point-body{fill:var(--dc-whale-stroke,url(#dc-auth-whale-ink));stroke:none}
+#deepseek-cockpit .dc-permission h1{position:relative;font-size:34px;line-height:1.3;font-weight:400;letter-spacing:5px;margin:-1px 0 30px;color:#e7f3ff;background:linear-gradient(108deg,#299dff 0%,#83f5ff 27%,#eaffff 49%,#52ddff 70%,#5485ff 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:none}
+#deepseek-cockpit .dc-permission .dc-entry-command,#deepseek-cockpit.dc-preflight .dc-login .dc-entry-command{margin:0;opacity:1}
+#deepseek-cockpit .dc-permission .dc-submit,#deepseek-cockpit.dc-preflight .dc-login .dc-submit{min-height:68px;padding:13px 5px 16px;gap:18px;color:#cceaff;transition:filter .3s,transform .3s}
+#deepseek-cockpit .dc-permission .dc-submit::before,#deepseek-cockpit.dc-preflight .dc-login .dc-submit::before{inset:-12px -25px;background:linear-gradient(90deg,transparent,#187aff20 25%,#0bdfff25 55%,#ffaa4b10 80%,transparent);filter:blur(10px);opacity:.8}
+#deepseek-cockpit .dc-permission .dc-submit::after,#deepseek-cockpit.dc-preflight .dc-login .dc-submit::after{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#267bff66,#22eaffbb,#ffb64b44,transparent);opacity:.5;transition:opacity .3s}
+#deepseek-cockpit .dc-permission .dc-submit:hover::after,#deepseek-cockpit.dc-preflight .dc-login .dc-submit:hover::after{opacity:1}
+#deepseek-cockpit .dc-permission .dc-entry-label,#deepseek-cockpit.dc-preflight .dc-login .dc-entry-label{font-size:19px;letter-spacing:5px;background:linear-gradient(100deg,#53b6ff,#bcffff 48%,#51dbff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:none}
+#deepseek-cockpit .dc-permission .dc-entry-track,#deepseek-cockpit.dc-preflight .dc-login .dc-entry-track{right:0;background:linear-gradient(90deg,transparent,#267fff88,#32eeffcc,#ffaa4b55,transparent)}
+#deepseek-cockpit .dc-permission .dc-entry-track::after,#deepseek-cockpit.dc-preflight .dc-login .dc-entry-track::after{background:linear-gradient(90deg,transparent,#ffc16c,#edffff,#22dfff,transparent)}
+#deepseek-cockpit.dc-preflight .dc-login{top:17%}
+#deepseek-cockpit .dc-login .dc-auth-anchor{height:230px}
+#deepseek-cockpit.dc-preflight .dc-login .dc-form{position:relative;padding-top:5px}
+#deepseek-cockpit .dc-credentials{position:relative;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:22px;margin:6px 0 22px;padding:19px 2px 23px}
+#deepseek-cockpit .dc-credentials::before,#deepseek-cockpit .dc-credentials::after{content:"";position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,#7bcaef77,#7bcaef22 70%,transparent)}
+#deepseek-cockpit .dc-credentials::before{top:0}
+#deepseek-cockpit .dc-credentials::after{bottom:0;opacity:.45}
+#deepseek-cockpit .dc-credential{min-width:0}
+#deepseek-cockpit .dc-credential+.dc-credential{padding-left:20px;border-left:1px solid #91c6e326}
+#deepseek-cockpit .dc-credential dt{font:400 11px/1.4 "SFMono-Regular",Consolas,monospace;letter-spacing:2px;color:#88abc3;margin:0 0 10px}
+#deepseek-cockpit .dc-credential dd{margin:0;min-height:30px;white-space:nowrap;color:#e3f3ff;text-shadow:0 0 17px #76d9ff2b}
+#deepseek-cockpit .dc-credential-name{font:500 23px/1.3 "Chakra Petch","PingFang SC",sans-serif;letter-spacing:1.2px}
+#deepseek-cockpit .dc-credential-key{font:400 19px/1.6 "SFMono-Regular",Consolas,monospace;letter-spacing:3px;color:#b8e4f5}
+#deepseek-cockpit .dc-command-check{display:none}
+#deepseek-cockpit .dc-gate-processing .dc-entry-track::after{animation:dc-command-charge 1.25s ease-in-out infinite}
+#deepseek-cockpit .dc-gate-processing .dc-entry-label{background-size:220% 100%;animation:dc-auth-text 1.6s ease-in-out infinite}
+#deepseek-cockpit .dc-gate-confirmed .dc-command-arrow{display:none}
+#deepseek-cockpit .dc-gate-confirmed .dc-command-check{display:block}
+#deepseek-cockpit .dc-gate-confirmed .dc-entry-glyph{filter:drop-shadow(0 0 13px #96e7ff);transform:translateX(0)}
+#deepseek-cockpit .dc-gate-confirmed .dc-entry-glyph::before{transform:rotate(45deg) scale(.8)}
+#deepseek-cockpit .dc-gate-confirmed .dc-entry-glyph::after{transform:rotate(45deg) scale(1.6);opacity:0;transition:transform .65s,opacity .65s}
+#deepseek-cockpit .dc-gate-confirmed .dc-entry-label{-webkit-text-fill-color:#e5faff;text-shadow:0 0 22px #89d5ff77}
+#deepseek-cockpit.dc-preflight .dc-gate-exit{animation:dc-auth-dissolve .68s cubic-bezier(.5,0,.2,1) both}
+#deepseek-cockpit .dc-gate-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#deepseek-cockpit.dc-auth-charging .dc-scene{transition:filter .8s;filter:brightness(calc(var(--dc-scene-light) + .08)) saturate(1.15)}
+#deepseek-cockpit.dc-auth-sealed .dc-scene{transition:filter .65s;filter:brightness(calc(var(--dc-scene-light) + .18)) saturate(1.25)}
+@keyframes dc-auth-arrive{from{opacity:0;filter:blur(8px);transform:translate(-50%,10px)}to{opacity:1;filter:blur(0);transform:translate(-50%,0)}}
+@keyframes dc-auth-dissolve{0%{opacity:1;filter:blur(0);transform:translateX(-50%);clip-path:inset(-30% -30%)}45%{opacity:.9;filter:blur(1px);transform:translateX(-50%) scale(1.015);clip-path:inset(12% -30%)}100%{opacity:0;filter:blur(8px);transform:translateX(-50%) scale(1.07);clip-path:inset(50% -30%)}}
+@keyframes dc-auth-text{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+@media(max-width:650px){
+  #deepseek-cockpit.dc-preflight .dc-permission,#deepseek-cockpit.dc-preflight .dc-login{top:22%;width:calc(100% - 48px);max-width:370px;padding:0 6px 24px}
+  #deepseek-cockpit .dc-auth-anchor{height:225px}
+  #deepseek-cockpit .dc-login .dc-auth-anchor{height:225px}
+  #deepseek-cockpit .dc-permission h1{font-size:25px;letter-spacing:3px;margin:0 0 25px}
+  #deepseek-cockpit .dc-gate-kicker{gap:12px;letter-spacing:2px}
+  #deepseek-cockpit .dc-gate-kicker::before,#deepseek-cockpit .dc-gate-kicker::after{width:32px}
+  #deepseek-cockpit .dc-permission .dc-entry-label,#deepseek-cockpit.dc-preflight .dc-login .dc-entry-label{font-size:17px;letter-spacing:3px}
+  #deepseek-cockpit .dc-credentials{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;padding:17px 0 20px}
+  #deepseek-cockpit .dc-credential+.dc-credential{padding-left:13px}
+  #deepseek-cockpit .dc-credential dt{font-size:11px;letter-spacing:1px}
+  #deepseek-cockpit .dc-credential-name{font-size:18px;letter-spacing:.4px}
+  #deepseek-cockpit .dc-credential-key{font-size:16px;letter-spacing:2px}
+}

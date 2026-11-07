@@ -1,0 +1,38 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { mountCockpit } from '../src/runtime.js';
+import { clientFactory } from '../src/client.js';
+import { DEFAULTS } from '../src/config.js';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const read = file => fs.readFile(path.join(root, file), 'utf8');
+const asset = async (file, type) => 'data:' + type + ';base64,' + (await fs.readFile(path.join(root, 'assets', file))).toString('base64');
+let fragment = await read('src/scene/startup.template.html');
+const traces = JSON.parse(await read('src/scene/whale-traces.json'));
+const coordinates = traces[0].d.match(/-?[\d.]+/g).map(Number).filter((_, index) => index % 2 === 1);
+const top = Math.floor(Math.min(...coordinates)) - 2, height = Math.ceil(Math.max(...coordinates)) - top + 2;
+const whale = (await read('src/scene/whale-linework.svg')).replace('__DS_WHALE_BODY__', traces.map(trace => trace.d).join(' ')).replace('__DS_WHALE_TOP__', top).replace('__DS_WHALE_HEIGHT__', height);
+fragment = fragment.replace('__DS_WHALE_LINEWORK__', whale).replace('__DS_HOME_WHALE_PATH__', JSON.stringify(traces.map(trace => trace.d).join(' ')));
+for (const [token, file] of Object.entries({ VOICE_ENGINE: 'community-voice.js', INTERFACE_COPY: 'interface-copy.js', AUTH_STYLE: 'authorization.css', AUTH_VFX: 'credential-vfx.js', HOME_VFX: 'home-whale-stars.js', ACCESS_FLOW: 'access-flow.js' })) {
+  const content = await read('src/scene/' + file);
+  fragment = fragment.replace('__DS_' + token + '__', () => content);
+}
+fragment = fragment.replace('__DS_HOME_WHALE_PATH__', JSON.stringify(traces.map(trace => trace.d).join(' ')));
+for (const [token, file, type] of [['BG','cockpit-background.webp','image/webp'],['WHALE','deepseek-hologram.webp','image/webp'],['LOGO','deepseek-mark.png','image/png'],['VIDEO','cockpit-ambient.mp4','video/mp4'],['POSTER','cockpit-ambient-poster.webp','image/webp']]) fragment = fragment.replaceAll('__DS_' + token + '__', await asset(file, type));
+let fonts = '';
+for (const [file, style] of [['ChakraPetch-Medium.ttf','normal'],['ChakraPetch-MediumItalic.ttf','italic']]) fonts += '@font-face{font-family:"Chakra Petch";font-weight:500;font-style:' + style + ';font-display:swap;src:url("' + await asset('fonts/' + file, 'font/ttf') + '") format("truetype")}';
+fragment = fragment.replace('__DS_FONTS__', fonts);
+const icons = { languages: '<path d="m5 8 6 0m-3-3v3c0 5-2 7-5 9m1-6c1 3 4 5 7 6m3 2 4-11 4 11m-6-4h5"/>', 'audio-lines': '<path d="M3 10v4m4-7v10m5-14v18m5-14v10m4-7v4"/>', 'arrow-up-right':'<path d="M7 17 17 7M7 7h10v10"/>', 'move-right':'<path d="M3 12h18m-6-6 6 6-6 6"/>', check:'<path d="m5 12 4 4L19 6"/>' };
+fragment = fragment.replace(/<i data-lucide="([a-z-]+)"[^>]*><\/i>/g, (_, icon) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (icons[icon] || '') + '</svg>');
+const viewport = '<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030710}#deepseek-cockpit{height:100vh;height:100dvh;width:100%;} @media(max-height:560px) and (min-width:651px){#deepseek-cockpit .dc-auth-anchor{transform:scale(.7);transform-origin:center bottom}#deepseek-cockpit .dc-home-copy{top:20%}#deepseek-cockpit .dc-home-headline{bottom:55px}}</style>';
+const sceneHtml = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DeepSeek Harness Cockpit</title><script>/*__COCKPIT_CONFIG__*/</script></head><body>' + fragment + viewport + '</body></html>';
+if (/__DS_[A-Z_]+__/.test(sceneHtml)) throw new Error('Unresolved scene token');
+if (/window\.openai|globalThis\.Tweak|dc-replay/.test(sceneHtml)) throw new Error('Prototype-only code remains');
+for (const match of sceneHtml.matchAll(/<script>([\s\S]*?)<\/script>/g)) new Function(match[1]);
+const version = JSON.parse(await read('package.json')).version;
+const boot = '(' + mountCockpit.toString() + ')(' + JSON.stringify(sceneHtml) + ',window.__DSH_COCKPIT_CONFIG__||' + JSON.stringify(DEFAULTS) + ');';
+const client = 'window.__ModuleLoader__.load({id:"dsh-cockpit-startup",factory:function(require){return (' + clientFactory.toString() + ')(require,' + mountCockpit.toString() + ',' + JSON.stringify(sceneHtml) + ',' + JSON.stringify(DEFAULTS) + ',' + JSON.stringify(version) + ');}});';
+new Function(boot); new Function(client);
+await fs.mkdir(path.join(root, 'lib'), { recursive: true });
+await Promise.all([fs.writeFile(path.join(root,'lib/scene.html'), sceneHtml), fs.writeFile(path.join(root,'lib/boot.js'), boot), fs.writeFile(path.join(root,'lib/client.js'), client), fs.copyFile(path.join(root,'src/host.js'),path.join(root,'lib/index.js')), fs.copyFile(path.join(root,'src/config.js'),path.join(root,'lib/config.js')), fs.copyFile(path.join(root,'assets/fonts/OFL.txt'),path.join(root,'lib/FONT-LICENSE.txt'))]);
+console.log('Built cockpit plugin v' + version + ' (' + Math.round(Buffer.byteLength(sceneHtml) / 1024) + ' KiB scene, all media and fonts bundled)');
